@@ -1,26 +1,31 @@
 import logging
 import os, sys, time
-import hashlib
+import hashlib, traceback
 
-logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+logging.getLogger('pyreload').setLevel(logging.DEBUG)
 
+class PyreloadPermissionError(PermissionError):
+	pass
 
-class PyReload:
-	def __init__(self, ingore_file: str = "._ignore", path: list() = [os.path.basename(__file__)]):
+class PyReload(object):
+	def __init__(self, ignore_file: str = "._ignore", path: list() = [os.path.basename(__file__)]):
 		if type(path) != list:
 			self.path = [path]
 		else:
 			self.path = path
 
-		self._ignore(ingore_file)
+		self.ignore_file = ignore_file
+		self._ignore(self.ignore_file)
 
 		self.timestamp = self.get_timestamp()
 		self.hash_text = [{file:self.get_hash_text(path=file)} for file in self.path]
-		logging.info("[+] Started PyReload")
 
-	def _ignore(self, ingore_file):
-		with open(ingore_file, encoding="utf-8") as conf_ign: ign = conf_ign.readlines()
-		# [ self.path.remove(file.replace("\n","")) for file in ign ]
+	def _ignore(self, ignore_file):
+		try:
+			with open(ignore_file, encoding="utf-8") as conf_ign: ign = conf_ign.readlines()
+		except FileNotFoundError:
+			with open(ignore_file, 'a+', encoding="utf-8") as conf_ign: ign = conf_ign.readlines()
+
 		for file in ign:
 			try:
 				self.path.remove(file.replace("\n",""))
@@ -35,7 +40,9 @@ class PyReload:
 		try:
 			with open(path, "rb") as file:
 				return self.encode_md5(file.read())
-		except FileNotFoundError as e: 
+		except PermissionError as e:
+			raise PyreloadPermissionError('%s. Add this file to %s, then the error will disappear.' % (e, self.ignore_file)) 
+		except FileNotFoundError as e:
 			logging.error(f"Файл {path} не был найден")
 			self.path.remove(e.filename)
 
@@ -43,6 +50,8 @@ class PyReload:
 		try:
 			return [{file:os.stat(file).st_mtime} for file in self.path]
 		except FileNotFoundError as e: 
+			print(os.path.basename(__file__))
+			print("ERROR:",traceback.format_exc())
 			logging.error(f"Файл {e.filename} не был найден")
 			self.path.remove(e.filename)
 	
@@ -56,7 +65,7 @@ class PyReload:
 
 
 
-class UpdateFile:
+class UpdateFile(object):
 	def __init__(self, pr: PyReload = None):
 		self.pr = pr
 		self.func = None
@@ -84,5 +93,9 @@ class UpdateFile:
 		return self
 
 	def run(self):
-		eval("self.%s()" % self.func)
-		time.sleep(.1)
+		try: eval("self.%s()" % self.func)
+		except KeyboardInterrupt: logging.info("[-] Stopped PyReload")
+
+	async def async_run(self):
+		try: eval("self.%s()" % self.func)
+		except KeyboardInterrupt: logging.info("[-] Stopped PyReload")
