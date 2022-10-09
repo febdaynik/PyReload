@@ -1,6 +1,6 @@
 import logging
 import os, sys, time
-import hashlib, traceback
+import hashlib
 
 logging.getLogger('pyreload').setLevel(logging.DEBUG)
 
@@ -50,8 +50,6 @@ class PyReload(object):
 		try:
 			return [{file:os.stat(file).st_mtime} for file in self.path]
 		except FileNotFoundError as e: 
-			print(os.path.basename(__file__))
-			print("ERROR:",traceback.format_exc())
 			logging.error(f"Файл {e.filename} не был найден")
 			self.path.remove(e.filename)
 	

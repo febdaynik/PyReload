@@ -134,3 +134,5 @@ dmypy.json
 activate.bat
 p2p_flask
 p2p_socket
+dist
+python-reload.egg-info
