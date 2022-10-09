@@ -1,30 +1,29 @@
 PyReload
 =====
 
-Библиотека для быстрого взаимодействия с кодом в файле.
-PyReload - позволяет обновлять код в реальном времени
+Library for quick interaction with the code in the file.
+PyReload - allows you to update the code in real time
 
-Конфигурация
+Configuration
 ====
 
-Чтобы не следить за всеми файлами их можно поместить в файл игнорирования, по стандарту он '._ingore'. Для этого вам понадобится:
+In order not to keep track of all the files, they can be placed in the ignore file, according to the standard it is '._ingore'. To do this, you will need:
 ```
-1. Создать файл игнорирования
-2. Добавить игнорируемые файлы
-3. Запустить скрипт (если файл называется иначе, то передайте его название через параметр 'ignore_file')
+1. Create a ignore file
+2. Add ignored files
+3. Run the script (if the file is called differently, then pass its name through the 'ignore_file' parameter)
 
-ps: Создание файл не является обязательным
-
+ps: Creating a file is optional
 ```
 ```python
 # Example ignore file
 pr = PyReload(ignore_file = 'custom_name_ignore_file.txt')
 ```
 
-Примеры
+Examples
 ====
 
-## Для aiogram
+## pyreload + aiogram
 
 ```python
 # update code in framework aiogram
@@ -49,7 +48,7 @@ if __name__ == '__main__':
 	executor.start_polling(dp, skip_updates=True, on_startup=on_startup)   
 ```
 
-## Для vkbottle
+## pyreload + vkbottle
 
 ```python
 # update code in framework aiogram
