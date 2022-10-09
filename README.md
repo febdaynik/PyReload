@@ -26,14 +26,19 @@ ps: Создание файл не является обязательным
 
 import os
 from pyreload import PyReload
-async def _reload():
-	pr.update_file.hash().run()
+async def repeated_task():
+	while 1:
+		await pr.update_file.hash().async_run()
+		await asyncio.sleep(1)
 
-def repeat(coro, loop):
-	asyncio.ensure_future(coro(), loop=loop)
-	loop.call_later(1, repeat, coro, loop)
+async def on_startup(_):
+	logging.info("Bot started")
+
+
+	logging.info("Started waiting reload")
+	asyncio.create_task(repeated_task())
 
 if __name__ == '__main__':
 	pr = PyReload(path=os.listdir())
-	executor.start_polling(dp, skip_updates=True, loop=loop)   
+	executor.start_polling(dp, skip_updates=True, on_startup=on_startup)   
 ```
