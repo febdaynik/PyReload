@@ -4,6 +4,8 @@ PyReload
 Library for quick interaction with the code in the file.
 PyReload - allows you to update the code in real time
 
+`pip install aiogram`
+
 Configuration
 ====
 
